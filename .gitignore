@@ -14,8 +14,6 @@ yarn-error.log*
 pnpm-debug.log*
 
 # Environment variables
-.env
-.env.*
 !.env.example
 
 # Logs
@@ -55,3 +53,4 @@ ehthumbs.db
 scripts/assets/metadata
 
 *.rej*
+config.bat
