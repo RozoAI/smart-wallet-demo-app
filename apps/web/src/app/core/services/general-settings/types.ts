@@ -9,6 +9,7 @@ export type FeatureFlags =
   | 'wallet-coming-soon'
   | 'products-list'
   | 'vendors-list'
+  | 'nfts'
 
 export interface IGeneralSettingsService {
   getFeatureFlags: () => Promise<GetFeatureFlagsResult>
