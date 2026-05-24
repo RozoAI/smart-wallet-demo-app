@@ -16,6 +16,8 @@ import { useDeepLink } from '../../hooks/use-deep-link'
 import { useFeatureFlagsRefetchOnFocus } from '../../hooks/use-feature-flags-refetch-on-focus'
 import { useHandleAirdrop } from '../../hooks/use-handle-airdrop'
 import { useHandleBehindScenes } from '../../hooks/use-handle-behind-scenes'
+import { useHandleDayOneTeaser } from '../../hooks/use-handle-day-one-teaser'
+import { useHandleEventSchedule } from '../../hooks/use-handle-event-schedule'
 import { useHandleLeftSwags } from '../../hooks/use-handle-left-swags'
 import { useHandleTransferLeftAssets } from '../../hooks/use-handle-transfer-left-assets'
 import { useHandleWalletComingSoon } from '../../hooks/use-handle-wallet-coming-soon'
@@ -37,6 +39,9 @@ export const Home = () => {
     isWalletComingSoonActive,
     isProductsListActive,
     isVendorsListActive,
+    isNftsActive,
+    isEventScheduleActive,
+    isDayOneTeaserActive,
   ] = useFeatureFlagsState([
     'airdrop',
     'transfer-left-assets',
@@ -45,6 +50,9 @@ export const Home = () => {
     'wallet-coming-soon',
     'products-list',
     'vendors-list',
+    'nfts',
+    'event-schedule',
+    'day-one-teaser',
   ])
 
   // Wallet information
@@ -75,6 +83,16 @@ export const Home = () => {
   // Handle left swags
   const { banner: leftSwagsBanner } = useHandleLeftSwags({
     enabled: isLeftSwagsActive,
+  })
+
+  // Handle event schedule
+  const { banner: eventScheduleBanner } = useHandleEventSchedule({
+    enabled: isEventScheduleActive,
+  })
+
+  // Handle day one teaser
+  const { banner: dayOneTeaserBanner } = useHandleDayOneTeaser({
+    enabled: isDayOneTeaserActive,
   })
 
   const { banner: walletComingSoonBanner } = useHandleWalletComingSoon({
@@ -112,8 +130,6 @@ export const Home = () => {
 
   const handleScanClick = () => navigate({ to: WalletPagesPath.SCAN })
   const handleTapToPayTipClick = useCallback(() => openTapToPayModal(), [openTapToPayModal])
-
-  const handleSwagClick = () => navigate({ to: WalletPagesPath.SCAN })
 
   const faq: FaqOptions = useMemo(() => {
     let faqItems: FaqOptions['items'] = []
@@ -162,11 +178,6 @@ export const Home = () => {
       }))
   }, [walletData?.vendors])
 
-  const isSwagActionButtonDisabled = useMemo(
-    () => (walletData?.swags || []).every(swag => swag.status === 'claimed'),
-    [walletData?.swags]
-  )
-
   const isLoadingFaq = useMemo(() => {
     const envFaq = import.meta.env.VITE_FAQ
     if (envFaq) return false
@@ -203,11 +214,13 @@ export const Home = () => {
 
   const topBanners = useMemo(() => {
     const bannersArray: BannerOptions[] = []
+    if (dayOneTeaserBanner) bannersArray.push(dayOneTeaserBanner)
+    if (eventScheduleBanner) bannersArray.push(eventScheduleBanner)
     if (walletComingSoonBanner) bannersArray.push(walletComingSoonBanner)
     if (behindScenesBanner) bannersArray.push(behindScenesBanner)
     if (transferLeftAssetsBanner) bannersArray.push(transferLeftAssetsBanner)
     return bannersArray
-  }, [walletComingSoonBanner, behindScenesBanner, transferLeftAssetsBanner])
+  }, [dayOneTeaserBanner, eventScheduleBanner, walletComingSoonBanner, behindScenesBanner, transferLeftAssetsBanner])
 
   return (
     <PullToRefresh
@@ -224,6 +237,7 @@ export const Home = () => {
         isLoadingFaq={isLoadingFaq}
         isLoadingSwags={isLoadingSwags}
         isLoadingVendors={isLoadingVendors}
+        isNftsActive={isNftsActive}
         balanceAmount={walletData?.balance || 0}
         topBanners={topBanners}
         banners={banners}
@@ -231,12 +245,10 @@ export const Home = () => {
         vendors={vendors}
         isProductsListActive={isProductsListActive}
         isVendorsListActive={isVendorsListActive}
-        isProductActionButtonDisabled={isSwagActionButtonDisabled}
         faq={faq}
         onNavbarButtonClick={handleNavbarButtonClick}
         onScanClick={handleScanClick}
         onTapToPayTipClick={handleTapToPayTipClick}
-        onProductActionButtonClick={handleSwagClick}
       />
     </PullToRefresh>
   )

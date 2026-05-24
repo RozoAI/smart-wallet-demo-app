@@ -36,19 +36,18 @@ type Props = {
   isLoadingFaq: boolean
   isLoadingSwags: boolean
   isLoadingVendors: boolean
+  isNftsActive?: boolean
   balanceAmount: number
   topBanners?: BannerOptions[]
   banners?: BannerOptions[]
   products?: React.ComponentProps<typeof ImageCard>[]
   vendors?: React.ComponentProps<typeof VendorCard>[]
-  isProductActionButtonDisabled?: boolean
   isProductsListActive?: boolean
   isVendorsListActive?: boolean
   faq?: FaqOptions
   onNavbarButtonClick: (item: NavbarItemType) => void
   onScanClick: () => void
   onTapToPayTipClick: () => void
-  onProductActionButtonClick: () => void
 }
 
 export const HomeTemplate = ({
@@ -56,6 +55,7 @@ export const HomeTemplate = ({
   isLoadingFaq,
   isLoadingSwags,
   isLoadingVendors,
+  isNftsActive = false,
   balanceAmount,
   topBanners,
   banners,
@@ -72,7 +72,6 @@ export const HomeTemplate = ({
     },
   ],
   vendors = [],
-  isProductActionButtonDisabled,
   isProductsListActive,
   isVendorsListActive,
   faq = {
@@ -91,7 +90,6 @@ export const HomeTemplate = ({
   onNavbarButtonClick,
   onScanClick,
   onTapToPayTipClick,
-  onProductActionButtonClick,
 }: Props) => {
   const paymentVariant = import.meta.env.VITE_PAYMENT_VARIANT as PaymentVariant
 
@@ -112,12 +110,14 @@ export const HomeTemplate = ({
 
     return (
       <nav className="w-full gap-2 flex justify-between items-center">
-        <NavbarButton navbarItem="nft">
-          <div className="flex items-center gap-2">
-            <Icon.Image01 />
-            {c('navbarItemATitle')}
-          </div>
-        </NavbarButton>
+        {isNftsActive && (
+          <NavbarButton navbarItem="nft">
+            <div className="flex items-center gap-2">
+              <Icon.Image01 />
+              {c('navbarItemATitle')}
+            </div>
+          </NavbarButton>
+        )}
         <NavbarButton navbarItem="history">
           <div className="flex items-center gap-2">
             <Icon.ClockRewind />
@@ -237,21 +237,14 @@ export const HomeTemplate = ({
     </Carousel>
   )
 
-  const ProductActionButton = () => (
-    <div className="flex flex-col items-center gap-3">
-      <Button
-        disabled={isProductActionButtonDisabled || isLoadingSwags}
-        onClick={onProductActionButtonClick}
-        variant={'secondary'}
-        size={'lg'}
-        isRounded
-        isFullWidth
-      >
-        {c('walletHomeProductListButtonText')}
-      </Button>
+  const ProductActionInfo = () => (
+    <div className="flex flex-col items-center gap-1 text-center">
+      <Text as={'p'} size={'sm'} weight="bold">
+        {c('walletHomeProductListInfoTitle')}
+      </Text>
       <div className="text-textSecondary">
         <Text as={'p'} size={'xs'} weight="medium">
-          {c('walletHomeProductListButtonDescription')}
+          {c('walletHomeProductListInfoDescription')}
         </Text>
       </div>
     </div>
@@ -287,7 +280,7 @@ export const HomeTemplate = ({
         {isProductsListActive && (
           <>
             <ProductList />
-            <ProductActionButton />
+            <ProductActionInfo />
           </>
         )}
         {isVendorsListActive && <VendorsList />}
